@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For ESP32 BLE Keyboard
+# Syntax Coloring Map For ESP32C3 BLE Keyboard
 #######################################
 # Class
 #######################################

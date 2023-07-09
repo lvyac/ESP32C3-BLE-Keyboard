@@ -1,6 +1,6 @@
-# ESP32 BLE Keyboard library
+# ESP32C3 BLE Keyboard library
 
-This library allows you to make the ESP32 act as a Bluetooth Keyboard and control what it does.  
+This library allows you to make the ESP32C3 act as a Bluetooth Keyboard and control what it does.  
 You might also be interested in:
 - [ESP32-BLE-Mouse](https://github.com/T-vK/ESP32-BLE-Mouse)
 - [ESP32-BLE-Gamepad](https://github.com/lemmingDev/ESP32-BLE-Gamepad)
@@ -19,61 +19,114 @@ You might also be interested in:
  - [x] Compatible with Linux
  - [x] Compatible with MacOS X (not stable, some people have issues, doesn't work with old devices)
  - [x] Compatible with iOS (not stable, some people have issues, doesn't work with old devices)
+ - [x] For Seeed Studio XIAO ESP32C3
+ - [x] セキュリティの関係でNimBLE-ArduinoがヘッダーでOnになっています
 
 ## Installation
 - (Make sure you can use the ESP32 with the Arduino IDE. [Instructions can be found here.](https://github.com/espressif/arduino-esp32#installation-instructions))
-- [Download the latest release of this library from the release page.](https://github.com/T-vK/ESP32-BLE-Keyboard/releases)
+- [Download the latest release of this library from this page.](https://github.com/oden-umaru/ESP32C3-BLE-Keyboard)
 - In the Arduino IDE go to "Sketch" -> "Include Library" -> "Add .ZIP Library..." and select the file you just downloaded.
-- You can now go to "File" -> "Examples" -> "ESP32 BLE Keyboard" and select any of the examples to get started.
+- You can now go to "File" -> "Examples" -> "ESP32C3 BLE Keyboard" and select any of the examples to get started.
 
 ## Example
 
 ``` C++
 /**
- * This example turns the ESP32 into a Bluetooth LE keyboard that writes the words, presses Enter, presses a media key and then Ctrl+Alt+Delete
+ * This example turns the ESP32 into a Bluetooth LE keyboard that presses a media key
+ * https://github.com/T-vK/ESP32-BLE-Keyboardを改変しESP32C3でのメディアコントロールに特化したやつ
+ * NimBLE-Arduinoをライブラリマネージャからダウンロードしてください
  */
 #include <BleKeyboard.h>
 
-BleKeyboard bleKeyboard;
+BleKeyboard bleKeyboard("ESP32 Media Keybord","Mendako Lab",50);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
   bleKeyboard.begin();
+  
+  // 使えるメディア制御コマンド
+  // keyIDの実装参考
+  // https://www.usb.org/document-library/hid-usage-tables-14
+  /*
+  KEY_MEDIA_NEXT_TRACK
+  KEY_MEDIA_PREVIOUS_TRACK
+  KEY_MEDIA_STOP 
+  KEY_MEDIA_PLAY
+  KEY_MEDIA_PAUSE
+  KEY_MEDIA_MUTE
+  KEY_MEDIA_VOLUME_UP
+  KEY_MEDIA_VOLUME_DOWN
+  */
+  
+  // 入力ピンの設定
+  // D6,8,9はめんどくさいので使わない
+  // 詳細は → https://lab.seeed.co.jp/entry/2023/04/03/120000
+  pinMode(D0,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D1,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D2,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D3,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D4,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D5,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D7,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+  pinMode(D10,INPUT_PULLUP);    //GPIO0(BOOT)をプルアップ付き入力設定
+
 }
 
 void loop() {
+  // 長押し判定用のフラグ
+  static bool flag_KEY_MEDIA_NEXT_TRACK = false;
+  static bool flag_KEY_MEDIA_PREVIOUS_TRACK = false;
   if(bleKeyboard.isConnected()) {
-    Serial.println("Sending 'Hello world'...");
-    bleKeyboard.print("Hello world");
-
-    delay(1000);
-
-    Serial.println("Sending Enter key...");
-    bleKeyboard.write(KEY_RETURN);
-
-    delay(1000);
-
-    Serial.println("Sending Play/Pause media key...");
-    bleKeyboard.write(KEY_MEDIA_PLAY_PAUSE);
-
-    delay(1000);
-    
-   //
-   // Below is an example of pressing multiple keyboard modifiers 
-   // which by default is commented out. 
-   // 
-   /* Serial.println("Sending Ctrl+Alt+Delete...");
-    bleKeyboard.press(KEY_LEFT_CTRL);
-    bleKeyboard.press(KEY_LEFT_ALT);
-    bleKeyboard.press(KEY_DELETE);
-    delay(100);
-    bleKeyboard.releaseAll();
-    */
-
+    if(digitalRead(D0) == LOW && flag_KEY_MEDIA_NEXT_TRACK == false){
+      Serial.println("Sending Scan Next Track media key...");
+      flag_KEY_MEDIA_NEXT_TRACK = true;
+      bleKeyboard.press(KEY_MEDIA_NEXT_TRACK);
+    }
+    else if(digitalRead(D0) == HIGH && flag_KEY_MEDIA_NEXT_TRACK == true){
+      flag_KEY_MEDIA_NEXT_TRACK = false;
+      bleKeyboard.release(KEY_MEDIA_NEXT_TRACK);
+    }
+    if(digitalRead(D1) == LOW && flag_KEY_MEDIA_PREVIOUS_TRACK == false){
+      Serial.println("Sending Scan Previous Track media key...");
+      flag_KEY_MEDIA_PREVIOUS_TRACK = true;
+      bleKeyboard.press(KEY_MEDIA_PREVIOUS_TRACK);
+    }
+    else if(digitalRead(D1) == HIGH && flag_KEY_MEDIA_PREVIOUS_TRACK == true){
+      flag_KEY_MEDIA_PREVIOUS_TRACK = false;
+      bleKeyboard.release(KEY_MEDIA_PREVIOUS_TRACK);
+    }
+    if(digitalRead(D2) == LOW){
+      Serial.println("Sending Stop media key...");
+      bleKeyboard.write(KEY_MEDIA_STOP);
+      delay(200);
+    }
+    if(digitalRead(D3) == LOW){
+      Serial.println("Sending Play media key...");
+      bleKeyboard.write(KEY_MEDIA_PLAY);
+      delay(200);
+    }
+    if(digitalRead(D4) == LOW){
+      Serial.println("Sending Pause media key...");
+      bleKeyboard.write(KEY_MEDIA_PAUSE);
+      delay(200);
+    }
+    if(digitalRead(D5) == LOW){
+      Serial.println("Sending Mute media key...");
+      bleKeyboard.write(KEY_MEDIA_MUTE);
+      delay(200);
+    }
+    if(digitalRead(D7) == LOW){
+      Serial.println("Sending Volume Increment media key...");
+      bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+      delay(50);
+    }
+    if(digitalRead(D10) == LOW){
+      Serial.println("Sending Volume Decrement media key...");
+      bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+      delay(50);
+    }
   }
-  Serial.println("Waiting 5 seconds...");
-  delay(5000);
 }
 ```
 

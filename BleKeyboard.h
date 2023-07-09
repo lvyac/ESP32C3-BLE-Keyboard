@@ -1,5 +1,5 @@
 // uncomment the following line to use NimBLE library
-//#define USE_NIMBLE
+#define USE_NIMBLE
 
 #ifndef ESP32_BLE_KEYBOARD_H
 #define ESP32_BLE_KEYBOARD_H
@@ -28,10 +28,10 @@
 
 #include "Print.h"
 
-#define BLE_KEYBOARD_VERSION "0.0.4"
+#define BLE_KEYBOARD_VERSION "0.0.5"
 #define BLE_KEYBOARD_VERSION_MAJOR 0
 #define BLE_KEYBOARD_VERSION_MINOR 0
-#define BLE_KEYBOARD_VERSION_REVISION 4
+#define BLE_KEYBOARD_VERSION_REVISION 5
 
 const uint8_t KEY_LEFT_CTRL = 0x80;
 const uint8_t KEY_LEFT_SHIFT = 0x81;
@@ -105,11 +105,11 @@ typedef uint8_t MediaKeyReport[2];
 const MediaKeyReport KEY_MEDIA_NEXT_TRACK = {1, 0};
 const MediaKeyReport KEY_MEDIA_PREVIOUS_TRACK = {2, 0};
 const MediaKeyReport KEY_MEDIA_STOP = {4, 0};
-const MediaKeyReport KEY_MEDIA_PLAY_PAUSE = {8, 0};
-const MediaKeyReport KEY_MEDIA_MUTE = {16, 0};
-const MediaKeyReport KEY_MEDIA_VOLUME_UP = {32, 0};
-const MediaKeyReport KEY_MEDIA_VOLUME_DOWN = {64, 0};
-const MediaKeyReport KEY_MEDIA_WWW_HOME = {128, 0};
+const MediaKeyReport KEY_MEDIA_PLAY = {8, 0};
+const MediaKeyReport KEY_MEDIA_PAUSE = {16, 0};
+const MediaKeyReport KEY_MEDIA_MUTE = {32, 0};
+const MediaKeyReport KEY_MEDIA_VOLUME_UP = {64, 0};
+const MediaKeyReport KEY_MEDIA_VOLUME_DOWN = {128, 0};
 const MediaKeyReport KEY_MEDIA_LOCAL_MACHINE_BROWSER = {0, 1}; // Opens "My Computer" on Windows
 const MediaKeyReport KEY_MEDIA_CALCULATOR = {0, 2};
 const MediaKeyReport KEY_MEDIA_WWW_BOOKMARKS = {0, 4};
@@ -150,7 +150,7 @@ private:
   uint16_t version   = 0x0210;
 
 public:
-  BleKeyboard(std::string deviceName = "ESP32 Keyboard", std::string deviceManufacturer = "Espressif", uint8_t batteryLevel = 100);
+  BleKeyboard(std::string deviceName = "ESP32 Keyboard", std::string deviceManufacturer = "Espressif Systems", uint8_t batteryLevel = 80);
   void begin(void);
   void end(void);
   void sendReport(KeyReport* keys);
