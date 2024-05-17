@@ -28,6 +28,7 @@ You might also be interested in:
 - (Make sure you can use the ESP32 with the Arduino IDE. [Instructions can be found here.](https://github.com/espressif/arduino-esp32#installation-instructions))
 - [Download the latest release of this library from this page.](https://github.com/oden-umaru/ESP32C3-BLE-Keyboard)
 - In the Arduino IDE go to "Sketch" -> "Include Library" -> "Add .ZIP Library..." and select the file you just downloaded.
+- In the Arduino IDE Search And Install NimBLE-Arduino
 - You can now go to "File" -> "Examples" -> "ESP32C3 BLE Keyboard" and select any of the examples to get started.
 
 ## Example
